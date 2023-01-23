@@ -1,6 +1,6 @@
 const listMutations = {
-    set_countries(state, data) {
-        state.countries = data;
+    set_movies(state, data) {
+        state.movies = data;
     },
     set_selected(state, val) {
         state.selected = val;

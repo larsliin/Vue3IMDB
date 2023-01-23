@@ -1,11 +1,7 @@
 <template>
     <div>
-        <h1>List selected countries</h1>
-        <ul>
-            <li v-for="item in selected" :key="item.id">
-                <country :country="item"></country>
-            </li>
-        </ul>
+        <h1>PAGE 2</h1>
+        
     </div>
 </template>
 
@@ -13,11 +9,9 @@
 
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import Country from '../components/Country.vue'
 export default {
-    name: 'Page1',
+    name: 'Page2',
     components: {
-        Country
     },
     setup() {
         const store = useStore();

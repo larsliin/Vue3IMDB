@@ -1,6 +1,6 @@
 const listGetters = {
-    get_countries(state) {
-        return state.countries;
+    get_movies(state) {
+        return state.movies;
     },
     get_selected(state) {
         return state.selected;

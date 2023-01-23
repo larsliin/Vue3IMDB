@@ -6,7 +6,6 @@
 </template>
 
 <script>
-// import { useStore } from 'vuex';
 
 import MainNavigation from './components/MainNavigation.vue';
 
@@ -15,12 +14,6 @@ export default {
     components: {
         MainNavigation
     },
-    setup() {
-        // const store = useStore();
-
-        // console.log(store.dispatch('list/fetch_countries'));
-
-    }
 };
 </script>
 

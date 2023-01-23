@@ -5,7 +5,7 @@ import actions from "./actions";
 const list = {
     namespaced: true,
     state: {
-        countries: [],
+        movies: [],
         selected: [],
     },
     getters : getters,
