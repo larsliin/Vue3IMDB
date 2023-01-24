@@ -5,7 +5,7 @@ const listActions = {
         const options = {
             method: 'GET',
             headers: {
-                'X-RapidAPI-Key': '136abbac66mshf4aab4b99fa7ecbp13288cjsn41ca7ed4997f',
+                'X-RapidAPI-Key': 'KEY',
                 'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
             }
         };
