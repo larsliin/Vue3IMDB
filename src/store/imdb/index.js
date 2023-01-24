@@ -2,15 +2,15 @@ import getters from "./getters";
 import mutations from "./mutations";
 import actions from "./actions";
 
-const list = {
+const imdb = {
     namespaced: true,
     state: {
         movies: [],
-        selected: [],
+        search: '',
     },
     getters : getters,
     mutations : mutations,
     actions : actions,
 }
 
-export default list;
+export default imdb;

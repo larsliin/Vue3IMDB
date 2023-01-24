@@ -1,12 +1,15 @@
 <template>
-    <div>
+    <div class="container">
         <h1>HOME PAGE</h1>
-        <div class="container"></div>
+        <ul v-if="movies.length">
+            <li v-for="movie in movies" :key="movie.id">
+                <router-link class="nav-link" :to="`/details/${movie.title}`">{{ movie.title }}</router-link>
+            </li>
+        </ul>
     </div>
 </template>
-
 <script>
-// import ref from 'vue';
+import { useRoute } from 'vue-router';
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
@@ -14,12 +17,12 @@ export default {
     name: 'Home',
     setup() {
         const store = useStore();
-        const movies = computed(() => store.getters['list/get_movies']);
-
-        console.log(movies.value);
+        const router = useRoute();
+        const movies = computed(() => store.getters['imdb/get_movies']);
 
         onMounted(() => {
-            store.dispatch('list/fetch_movies');
+            // store.commit('imdb/set_movies', []);
+            console.log(router);
         });
 
         return {

@@ -1,8 +1,8 @@
 import { createStore } from 'vuex';
-import list from './list/'
+import imdb from './imdb/'
 
 const store = createStore({
-    modules: { list },
+    modules: { imdb },
 });
 
 export default store;

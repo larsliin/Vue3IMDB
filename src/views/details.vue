@@ -1,21 +1,22 @@
 <template>
     <div>
-        <h1>PAGE 2</h1>
-        
+        <div class="container">
+            DETAILS
+        </div>
     </div>
 </template>
 
 <script>
-
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 export default {
-    name: 'Page2',
+    name: 'Details',
     components: {
     },
     setup() {
         const store = useStore();
-        const selected = computed(() => store.getters['list/get_selected']);
+        
+        const selected = computed(() => store.getters['imdb/get_selected']);
 
         return {
             selected
