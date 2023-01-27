@@ -1,15 +1,20 @@
 <template>
     <nav class="navbar navbar-light bg-light">
         <div class="container">
-            <router-link class="nav-link" to="/">Home</router-link>
+            <a class="nav-link" role="button" @click="onHomeClick">HOME</a>
             <div class="navbar" id="navbarSupportedContent">
-                
                 <form
                     class="form-inline my-2"
                     @submit.prevent="search">
+                    <!-- <span class="d-inline-block me-2">Search by</span>
+                    <select v-model="selected" class="form-select d-inline-block w-auto me-2">
+                        <option v-for="item in select" :key="item.value" :value="item.value">
+                            {{ item.text }}
+                        </option>
+                    </select> -->
                     <input
                         v-model="searchstr"
-                        class="form-control mr-sm-2 inp-search"
+                        class="form-control inp-search me-2"
                         type="search"
                         placeholder="Search"
                         aria-label="Search">
@@ -25,6 +30,7 @@
 </template>
 
 <script>
+import { useRouter, useRoute } from 'vue-router';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 
@@ -33,17 +39,44 @@ export default {
     components: {},
     setup() {
         const store = useStore();
+        const route = useRoute();
+        const router = useRouter();
         const searchstr = ref('');
+        const select = ref([{ text: 'Title', value: 'title' }, { text: 'Year', value: 'year' }]);
+        const selected = ref(select.value[0].value);
 
         function search($event) {
             $event.preventDefault();
 
-            store.dispatch('imdb/fetch_movies', { text: searchstr.value });
+            if (route.name !== 'Home') { 
+                
+                router.push({
+                    name: 'Home',
+                });
+            }
+            store.commit('imdb/set_searchStr', searchstr.value);
+            store.commit('imdb/set_movies', []);
+
+            store.dispatch('imdb/fetch_movies', { searchby: selected.value, text: searchstr.value, paginationKey: 0 })
+                .then(() => { 
+                    store.commit('imdb/set_sectionIndex', 0);
+                });
+        }
+
+        function onHomeClick() { 
+            store.commit('imdb/set_movies', []);
+
+            router.push({
+                name: 'Home',
+            });
         }
 
         return {
             search,
             searchstr,
+            onHomeClick,
+            select,
+            selected,
         }
     },
 }
@@ -86,7 +119,6 @@ export default {
     .inp-search {
         width: auto;
         display: inline-block;
-        margin-right:  var(--bs-gutter-x);
     }
 
     .inp-button {

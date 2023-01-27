@@ -5,8 +5,15 @@ import actions from "./actions";
 const imdb = {
     namespaced: true,
     state: {
+        movie: null,
         movies: [],
-        search: '',
+        plot: null,
+        currentPageIndex: 0,
+        resultsTotal: 0,
+        pagesTotal: 0,
+        searchStr: '',
+        loading: false,
+        sectionIndex: 0,
     },
     getters : getters,
     mutations : mutations,
