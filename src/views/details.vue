@@ -27,48 +27,36 @@
     </div>
 </template>
 
-<script>
-import { useRouter, useRoute } from 'vue-router';
+<script setup>
+import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { computed, onMounted, ref } from 'vue';
 
-export default {
-    name: 'Details',
-    components: {
-    },
-    setup() {
-        const store = useStore();
-        const route = useRoute();
+const store = useStore();
+const route = useRoute();
 
-        const movie = computed(() => store.getters['imdb/get_movie']);
+const movie = computed(() => store.getters['imdb/get_movie']);
         
-        const starringList = computed(() => {
-            return movie.value.principals ? movie.value.principals.map(e => e.name).join(', ') : null;
-        });
+const starringList = computed(() => {
+    return movie.value.principals ? movie.value.principals.map(e => e.name).join(', ') : null;
+});
         
-        const getMovieId = computed(() => { 
-            const arr = movie.value.id.split('/');
-            return arr.filter(e => e === 0 || e)[1];
-        });
+const getMovieId = computed(() => { 
+    const arr = movie.value.id.split('/');
+    return arr.filter(e => e === 0 || e)[1];
+});
         
-        const plot = computed(() => { 
-            store.dispatch('imdb/fetch_plot', { id: getMovieId.value });
-            return store.getters['imdb/get_plot'];
-        });
+const plot = computed(() => { 
+    store.dispatch('imdb/fetch_plot', { id: getMovieId.value });
+    return store.getters['imdb/get_plot'];
+});
 
-        onMounted(async() => { 
-            if (!store.getters['imdb/get_movie']) { 
-                store.dispatch('imdb/fetch_movie', { id: route.params.id });
-            }
-        });
-
-        return {
-            movie,
-            starringList,
-            plot,
-        }
-    },
-}
+onMounted(async() => { 
+    if (!store.getters['imdb/get_movie']) { 
+        store.dispatch('imdb/fetch_movie', { id: route.params.id });
+    }
+});
 </script>
+
 <style scoped>
 </style>

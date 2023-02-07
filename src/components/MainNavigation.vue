@@ -29,57 +29,45 @@
     </nav>
 </template>
 
-<script>
+<script setup>
+
 import { useRouter, useRoute } from 'vue-router';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 
-export default {
-    name: 'MainNavigation',
-    components: {},
-    setup() {
-        const store = useStore();
-        const route = useRoute();
-        const router = useRouter();
-        const searchstr = ref('');
-        const select = ref([{ text: 'Title', value: 'title' }, { text: 'Year', value: 'year' }]);
-        const selected = ref(select.value[0].value);
+const store = useStore();
+const route = useRoute();
+const router = useRouter();
+const searchstr = ref('');
+const select = ref([{ text: 'Title', value: 'title' }, { text: 'Year', value: 'year' }]);
+const selected = ref(select.value[0].value);
 
-        function search($event) {
-            $event.preventDefault();
+function search($event) {
+    $event.preventDefault();
 
-            if (route.name !== 'Home') { 
+    if (route.name !== 'Home') { 
                 
-                router.push({
-                    name: 'Home',
-                });
-            }
-            store.commit('imdb/set_searchStr', searchstr.value);
-            store.commit('imdb/set_movies', []);
+        router.push({
+            name: 'Home',
+        });
+    }
+    store.commit('imdb/set_searchStr', searchstr.value);
+    store.commit('imdb/set_movies', null);
 
-            store.dispatch('imdb/fetch_movies', { searchby: selected.value, text: searchstr.value, paginationKey: 0 })
-                .then(() => { 
-                    store.commit('imdb/set_sectionIndex', 0);
-                });
-        }
-
-        function onHomeClick() { 
-            store.commit('imdb/set_movies', []);
-
-            router.push({
-                name: 'Home',
-            });
-        }
-
-        return {
-            search,
-            searchstr,
-            onHomeClick,
-            select,
-            selected,
-        }
-    },
+    store.dispatch('imdb/fetch_movies', { searchby: selected.value, text: searchstr.value, paginationKey: 0 })
+        .then(() => { 
+            store.commit('imdb/set_sectionIndex', 0);
+        });
 }
+
+function onHomeClick() { 
+    store.commit('imdb/set_movies', []);
+
+    router.push({
+        name: 'Home',
+    });
+}
+        
 </script>
 <style scoped>
     nav {

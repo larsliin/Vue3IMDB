@@ -12,23 +12,12 @@
     </div>
 </template>
 
-<script>
-
+<script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 
-export default {
-    name: "App",
-    setup() {
-        const store = useStore();
-
-        const loading = computed(() => store.getters['imdb/get_loading']);
-        return {
-            loading,
-        }
-    }
-
-};
+const store = useStore();
+const loading = computed(() => store.getters['imdb/get_loading']);
 </script>
 
 <style scoped>

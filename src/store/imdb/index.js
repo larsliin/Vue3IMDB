@@ -6,7 +6,7 @@ const imdb = {
     namespaced: true,
     state: {
         movie: null,
-        movies: [],
+        movies: null,
         plot: null,
         currentPageIndex: 0,
         resultsTotal: 0,
@@ -14,6 +14,7 @@ const imdb = {
         searchStr: '',
         loading: false,
         sectionIndex: 0,
+        apiKey: 'key',
     },
     getters : getters,
     mutations : mutations,

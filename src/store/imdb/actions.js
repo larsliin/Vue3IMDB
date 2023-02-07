@@ -1,9 +1,9 @@
 const listActions = {
-    async fetch_movies({ commit }, data) {
+    async fetch_movies({ state, commit }, data) {
         const options = {
             method: 'GET',
             headers: {
-                'X-RapidAPI-Key': 'KEY',
+                'X-RapidAPI-Key': state.apiKey,
                 'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
             }
         };
@@ -16,8 +16,8 @@ const listActions = {
                 const pagesOverflow = response.totalMatches % 20;
                 let pagesTotal = (response.totalMatches - pagesOverflow) / 20;
                 pagesTotal = pagesOverflow > 0 ? pagesTotal + 1 : pagesTotal;
-
-                commit('set_movies', response.results);
+                console.log(response);
+                commit('set_movies', response.results ? response.results : []);
                 commit('set_resultsTotal', response.totalMatches);
                 commit('set_pagesTotal', pagesTotal);
                 commit('set_currentPageIndex', data.paginationKey);
@@ -26,11 +26,11 @@ const listActions = {
             .catch(err => console.error(err));
     },
 
-    async fetch_plot({ commit }, data) {
+    async fetch_plot({ state, commit }, data) {
         const options = {
             method: 'GET',
             headers: {
-                'X-RapidAPI-Key': '136abbac66mshf4aab4b99fa7ecbp13288cjsn41ca7ed4997f',
+                'X-RapidAPI-Key': state.apiKey,
                 'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
             }
         };
@@ -46,11 +46,11 @@ const listActions = {
             .catch(err => console.error(err));
     },
 
-    async fetch_movie({ commit }, data) {
+    async fetch_movie({ state, commit }, data) {
         const options = {
             method: 'GET',
             headers: {
-                'X-RapidAPI-Key': '136abbac66mshf4aab4b99fa7ecbp13288cjsn41ca7ed4997f',
+                'X-RapidAPI-Key': state.apiKey,
                 'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
             }
         };
