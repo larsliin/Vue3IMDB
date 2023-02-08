@@ -1,9 +1,16 @@
 import { defineStore } from 'pinia'
 
+const apiOptions = {
+    method: 'GET',
+    headers: {
+        'X-RapidAPI-Key': 'KEY',
+        'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+    }
+};
+
 export const useImdbStore = defineStore('imdb', {
     state: () => {
         return { 
-            apiKey: 'KEY',
             movie: null,
             movies: null,
             plot: null,
@@ -47,18 +54,10 @@ export const useImdbStore = defineStore('imdb', {
     },
     actions: {
         async fetch_movies(text = '', paginationKey = 0) {
-            const options = {
-                method: 'GET',
-                headers: {
-                    'X-RapidAPI-Key': this.apiKey,
-                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
-                }
-            };
-            
             this.loading = true;
 
             // eslint-disable-next-line
-            await fetch(`https://imdb8.p.rapidapi.com/title/v2/find?title=${text}&limit=20&sortArg=moviemeter%2Casc&paginationKey=${paginationKey}`, options)
+            await fetch(`https://imdb8.p.rapidapi.com/title/v2/find?title=${text}&limit=20&sortArg=moviemeter%2Casc&paginationKey=${paginationKey}`, apiOptions)
                 .then(response => response.json())
                 .then((response) => {
                     const pagesOverflow = response.totalMatches % 20;
@@ -75,15 +74,7 @@ export const useImdbStore = defineStore('imdb', {
         },
 
         async fetch_plot(id) {
-            const options = {
-                method: 'GET',
-                headers: {
-                    'X-RapidAPI-Key': this.apiKey,
-                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
-                }
-            };
-            
-            fetch(`https://imdb8.p.rapidapi.com/title/get-plots?tconst=${id}`, options)
+            fetch(`https://imdb8.p.rapidapi.com/title/get-plots?tconst=${id}`, apiOptions)
                 .then(response => response.json())
                 .then((response) => { 
                     if (response.plots.length) {
@@ -97,15 +88,7 @@ export const useImdbStore = defineStore('imdb', {
         },
     
         async fetch_movie(id) {
-            const options = {
-                method: 'GET',
-                headers: {
-                    'X-RapidAPI-Key': this.apiKey,
-                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
-                }
-            };
-            
-            await fetch(`https://imdb8.p.rapidapi.com/title/find?q=${id}`, options)
+            await fetch(`https://imdb8.p.rapidapi.com/title/find?q=${id}`, apiOptions)
                 .then(response => response.json())
                 .then((response) => {
                     this.movie = response.results[0];

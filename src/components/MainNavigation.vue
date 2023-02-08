@@ -56,7 +56,7 @@ function onHomeClick() {
         name: 'Home',
     });
 }
-        
+
 </script>
 <style scoped>
     nav {
