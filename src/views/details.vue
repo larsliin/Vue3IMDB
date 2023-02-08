@@ -1,19 +1,19 @@
 <template>
-    <div class="container" v-if="movie">
+    <div class="container" v-if="imdb.movie">
         <div class="row">
             <div class="col-sm-4">
-                <img :src="movie.image ? movie.image.url : '../assets/No-Image-Placeholder.png'" class="img-fluid" />
+                <img :src="imdb.movie.image ? imdb.movie.image.url : '../assets/No-Image-Placeholder.png'" class="img-fluid" />
             </div>
             <div class="col-sm-8">
                 <ul class="list-unstyled">
-                    <li v-if="movie.title">
-                        <strong>Title:</strong> {{ movie.title }}
+                    <li v-if="imdb.movie.title">
+                        <strong>Title:</strong> {{ imdb.movie.title }}
                     </li>
-                    <li v-if="movie.titleType">
-                        <strong>Type:</strong> {{ movie.titleType }}
+                    <li v-if="imdb.movie.titleType">
+                        <strong>Type:</strong> {{ imdb.movie.titleType }}
                     </li>
-                    <li v-if="movie.year">
-                        <strong>Year:</strong> {{ movie.year }}
+                    <li v-if="imdb.movie.year">
+                        <strong>Year:</strong> {{ imdb.movie.year }}
                     </li>
                     <li v-if="starringList">
                         <strong>Starring:</strong> {{ starringList }}
@@ -29,31 +29,29 @@
 
 <script setup>
 import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
 import { computed, onMounted, ref } from 'vue';
+import { useImdbStore } from '@/store/imdb/imdb';
 
-const store = useStore();
 const route = useRoute();
+const imdb = useImdbStore();
 
-const movie = computed(() => store.getters['imdb/get_movie']);
-        
 const starringList = computed(() => {
-    return movie.value.principals ? movie.value.principals.map(e => e.name).join(', ') : null;
+    return imdb.get_movie.principals ? imdb.get_movie.principals.map(e => e.name).join(', ') : null;
 });
         
 const getMovieId = computed(() => { 
-    const arr = movie.value.id.split('/');
+    const arr = imdb.get_movie.id.split('/');
     return arr.filter(e => e === 0 || e)[1];
 });
         
 const plot = computed(() => { 
-    store.dispatch('imdb/fetch_plot', { id: getMovieId.value });
-    return store.getters['imdb/get_plot'];
+    imdb.fetch_plot(getMovieId.value);
+    return imdb.get_plot;
 });
 
 onMounted(async() => { 
-    if (!store.getters['imdb/get_movie']) { 
-        store.dispatch('imdb/fetch_movie', { id: route.params.id });
+    if (!imdb.get_movie) { 
+        imdb.fetch_movie(route.params.id);
     }
 });
 </script>

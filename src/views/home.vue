@@ -6,48 +6,48 @@
                 <a role="button" @click="onTitleClick(movie.id)">{{ movie.title }}</a>
             </li>
         </ul> -->
-        <template v-if="movies && movies.length">
+        <template v-if="imdb.movies && imdb.movies.length">
             <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                <tr v-for="movie in movies" :key="movie.id" role="button" @click="onTitleClick(movie.id)">
+                <tr v-for="movie in imdb.movies" :key="movie.id" role="button" @click="onTitleClick(movie.id)">
                     <td width="100%" class="pb-2">
                         <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
                             <tr class="list-row">
-                                <!-- <td valign="top" width="100" class="wrapper-image pe-2">
+                                <td valign="top" width="100" class="wrapper-image pe-2">
                                     <img :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
-                                </td> -->
+                                </td>
                                 <td valign="top" class="pt-2 pb-2">{{ movie.title }}</td>
                             </tr>
                         </table>
                     </td>
                 </tr>
             </table>
-            <nav v-if="movies.length" aria-label="Page navigation example">
+            <nav v-if="imdb.movies.length" aria-label="Page navigation example">
                 <ul class="pagination">
-                    <li class="page-item" :class="currentPageIndex === 0 ? 'disabled' : ''">
+                    <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''">
                         <a class="page-link" role="button" aria-label="Previous" @click="onPageinationClick('-')">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    <li class="page-item" v-if="currentPageIndex > 9">
+                    <li class="page-item" v-if="imdb.currentPageIndex > 9">
                         <a class="page-link" role="button" aria-label="PreviousSection" @click="loadSection('previous')">
                             <span aria-hidden="true">...</span>
                         </a>
                     </li>
-                    <li v-for="index in Math.min(pagesTotal, 10)" :key="index" class="page-item">
+                    <li v-for="index in Math.min(imdb.pagesTotal, 10)" :key="index" class="page-item">
                         <a
                             class="page-link"
                             role="button"
-                            :class="currentPageIndex === (index + sectionIndex) - 1 ? 'fw-bold' : ''"
-                            @click="onPageinationClick((index + sectionIndex) - 1)">
-                            {{ index + sectionIndex }}
+                            :class="imdb.currentPageIndex === (index + imdb.sectionIndex) - 1 ? 'fw-bold' : ''"
+                            @click="onPageinationClick((index + imdb.sectionIndex) - 1)">
+                            {{ index + imdb.sectionIndex }}
                         </a>
                     </li>
-                    <li class="page-item" v-if="pagesTotal > 10">
+                    <li class="page-item" v-if="imdb.pagesTotal > 10">
                         <a class="page-link" role="button" aria-label="NextSection" @click="loadSection('next')">
                             <span aria-hidden="true">...</span>
                         </a>
                     </li>
-                    <li class="page-item" :class="currentPageIndex === pagesTotal - 1 ? 'disabled' : ''">
+                    <li class="page-item" :class="imdb.currentPageIndex === imdb.pagesTotal - 1 ? 'disabled' : ''">
                         <a class="page-link" role="button" aria-label="Next" @click="onPageinationClick('+')">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
@@ -55,35 +55,24 @@
                 </ul>
             </nav>
         </template>
-        <template v-else-if="movies && movies.length === 0 && searchStr.length">
+        <template v-else-if="imdb.movies && imdb.movies.length === 0 && imdb.searchStr.length">
             No results
         </template>
     </div>
 </template>
 
 <script setup>
-/*
-    1) use  script setup!
-    2) Use Pinia instead of Vuex
-        https://pinia.vuejs.org/
-    */
 import { useRouter } from 'vue-router';
-import { computed, ref } from 'vue';
-import { useStore } from 'vuex';
+import { useImdbStore } from '@/store/imdb/imdb';
 
-const store = useStore();
 const router = useRouter();
-const movies = computed(() => store.getters['imdb/get_movies']);
-const pagesTotal = computed(() => store.getters['imdb/get_pagesTotal']);
-const searchStr = ref(computed(() => store.getters['imdb/get_searchStr']));
-const currentPageIndex = ref(computed(() => store.getters['imdb/get_currentPageIndex']));
-const sectionIndex = ref(computed(() => store.getters['imdb/get_sectionIndex']));
-            
-function onTitleClick(event) { 
-    const movie = movies.value.find(e => e.id === event);
+const imdb = useImdbStore();
 
-    store.commit('imdb/set_movie', movie);
-    store.commit('imdb/set_plot', '');
+function onTitleClick(event) { 
+    const movie = imdb.movies.find(e => e.id === event);
+
+    imdb.movie = movie;
+    imdb.plot = '';
 
     router.push({
         name: 'Details',
@@ -102,15 +91,13 @@ function loadSection(dir) {
     let key;
     switch (dir) { 
     case 'previous':
-        store.commit('imdb/set_sectionIndex', sectionIndex.value - 10);
-        // sectionIndex.value -= 10;
+        imdb.sectionIndex = imdb.get_sectionIndex - 10;
         
-        key = sectionIndex.value + 9;
+        key = imdb.get_sectionIndex + 9;
         break;
     case 'next':
-        store.commit('imdb/set_sectionIndex', sectionIndex.value + 10);
-        // sectionIndex.value += 10;
-        key = sectionIndex.value;
+        imdb.sectionIndex = imdb.get_sectionIndex + 10;
+        key = imdb.get_sectionIndex;
         break;
     }
     onPageinationClick(key);
@@ -120,22 +107,18 @@ function onPageinationClick(key) {
     let pageKey;
     switch (key) { 
     case '+':
-        pageKey = currentPageIndex.value + 1;
+        pageKey = imdb.get_currentPageIndex.value + 1;
         break;
     case '-':
-        pageKey = currentPageIndex.value - 1;
+        pageKey = imdb.get_currentPageIndex.value - 1;
         break;
     default:
         pageKey = key;
     }
 
-    store.commit('imdb/set_sectionIndex', pageKey - (pageKey % 10));
-                
-    store.dispatch('imdb/fetch_movies', {
-        paginationKey: pageKey,
-        searchby: 'title',
-        text: store.getters['imdb/get_searchStr'],
-    });
+    imdb.sectionIndex = pageKey - (pageKey % 10);
+
+    imdb.fetch_movies(imdb.get_searchStr, pageKey);
 }
 </script>
 

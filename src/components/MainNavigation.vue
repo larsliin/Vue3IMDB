@@ -6,12 +6,6 @@
                 <form
                     class="form-inline my-2"
                     @submit.prevent="search">
-                    <!-- <span class="d-inline-block me-2">Search by</span>
-                    <select v-model="selected" class="form-select d-inline-block w-auto me-2">
-                        <option v-for="item in select" :key="item.value" :value="item.value">
-                            {{ item.text }}
-                        </option>
-                    </select> -->
                     <input
                         v-model="searchstr"
                         class="form-control inp-search me-2"
@@ -33,35 +27,30 @@
 
 import { useRouter, useRoute } from 'vue-router';
 import { ref } from 'vue';
-import { useStore } from 'vuex';
+import { useImdbStore } from '@/store/imdb/imdb';
 
-const store = useStore();
 const route = useRoute();
 const router = useRouter();
 const searchstr = ref('');
-const select = ref([{ text: 'Title', value: 'title' }, { text: 'Year', value: 'year' }]);
-const selected = ref(select.value[0].value);
+const imdb = useImdbStore();
 
 function search($event) {
     $event.preventDefault();
 
     if (route.name !== 'Home') { 
-                
         router.push({
             name: 'Home',
         });
     }
-    store.commit('imdb/set_searchStr', searchstr.value);
-    store.commit('imdb/set_movies', null);
 
-    store.dispatch('imdb/fetch_movies', { searchby: selected.value, text: searchstr.value, paginationKey: 0 })
-        .then(() => { 
-            store.commit('imdb/set_sectionIndex', 0);
-        });
+    imdb.searchStr = searchstr.value;
+    imdb.movies = [];
+    
+    imdb.fetch_movies(searchstr.value, 0);
 }
 
 function onHomeClick() { 
-    store.commit('imdb/set_movies', []);
+    imdb.movies = [];
 
     router.push({
         name: 'Home',

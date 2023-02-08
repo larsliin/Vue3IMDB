@@ -2,7 +2,7 @@
     <div>
         <main-navigation></main-navigation>
         <div class="wrapper">
-            <div class="loader" v-if="loading">
+            <div class="loader" v-if="imdb.loading">
                 <div class="spinner"></div>
             </div>
             <div class="py-4">
@@ -13,11 +13,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useImdbStore } from '@/store/imdb/imdb';
 
-const store = useStore();
-const loading = computed(() => store.getters['imdb/get_loading']);
+const imdb = useImdbStore();
 </script>
 
 <style scoped>
