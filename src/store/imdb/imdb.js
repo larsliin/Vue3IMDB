@@ -86,8 +86,10 @@ export const useImdbStore = defineStore('imdb', {
             fetch(`https://imdb8.p.rapidapi.com/title/get-plots?tconst=${id}`, options)
                 .then(response => response.json())
                 .then((response) => { 
-                    if (response.plots.length) { 
+                    if (response.plots.length) {
                         this.plot = response.plots[0].text;
+                    } else { 
+                        this.plot = 'No plot description available';
                     }
     
                 })

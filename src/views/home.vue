@@ -1,21 +1,17 @@
 <template>
     <div class="container">
-        <h1>HOME PAGE</h1>
-        <!-- <ul class="list-unstyled" v-if="movies.length">
-            <li v-for="movie in movies" :key="movie.id">
-                <a role="button" @click="onTitleClick(movie.id)">{{ movie.title }}</a>
-            </li>
-        </ul> -->
         <template v-if="imdb.movies && imdb.movies.length">
             <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
                 <tr v-for="movie in imdb.movies" :key="movie.id" role="button" @click="onTitleClick(movie.id)">
                     <td width="100%" class="pb-2">
                         <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
                             <tr class="list-row">
-                                <td valign="top" width="100" class="wrapper-image pe-2">
-                                    <img :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
+                                <td valign="top" width="80" class="wrapper-image">
+                                    <img @load="onThumbLoaded" width="80"
+                                    :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
+                                    <div class="thumb-placeholder"><div class="spinner"></div></div>
                                 </td>
-                                <td valign="top" class="pt-2 pb-2">{{ movie.title }}</td>
+                                <td valign="top" class="pt-2 pb-2 ps-2">{{ movie.title }}</td>
                             </tr>
                         </table>
                     </td>
@@ -68,6 +64,10 @@ import { useImdbStore } from '@/store/imdb/imdb';
 const router = useRouter();
 const imdb = useImdbStore();
 
+function onThumbLoaded(event) { 
+    event.target.classList.add('loaded')
+}
+
 function onTitleClick(event) { 
     const movie = imdb.movies.find(e => e.id === event);
 
@@ -103,7 +103,7 @@ function loadSection(dir) {
     onPageinationClick(key);
 }
 
-function onPageinationClick(key) {
+async function onPageinationClick(key) {
     let pageKey;
     switch (key) { 
     case '+':
@@ -118,7 +118,9 @@ function onPageinationClick(key) {
 
     imdb.sectionIndex = pageKey - (pageKey % 10);
 
-    imdb.fetch_movies(imdb.get_searchStr, pageKey);
+    await imdb.fetch_movies(imdb.get_searchStr, pageKey);
+
+    window.scrollTo(0, 0);
 }
 </script>
 
@@ -135,11 +137,43 @@ function onPageinationClick(key) {
         margin-right: 8px;
     }
 
+    .list-row {
+        border-radius: 10px;
+    }
+
     .list-row:hover {
-        background-color: #ccc;
+        box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.1);
     }
 
     .wrapper-image {
-        width: 100px;
+        width: 80px;
+    }
+
+    .thumb-placeholder {
+        background-color: #eee;
+        height: 100px;
+        position: relative;
+        width: 80px;
+    }
+
+    img {
+        display: none;
+    }
+    img.loaded{
+        display: block;
+    }
+
+    img.loaded + .thumb-placeholder {
+        display: none;
+    }
+
+    .thumb-placeholder .spinner {
+        border: 4px solid #333333;
+        height: 24px;
+        left: 50%;
+        margin: -12px 0 0 -12px;
+        position: absolute;
+        top: 50%;
+        width: 24px;
     }
 </style>

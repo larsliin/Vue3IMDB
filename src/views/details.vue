@@ -19,6 +19,7 @@
                         <strong>Starring:</strong> {{ starringList }}
                     </li>
                 </ul>
+                <content-placeholder v-if="!plot" />
                 <p>
                     {{ plot }}
                 </p>
@@ -29,8 +30,9 @@
 
 <script setup>
 import { useRoute } from 'vue-router';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useImdbStore } from '@/store/imdb/imdb';
+import contentPlaceholder from '@/components/ContentPlaceholder.vue';
 
 const route = useRoute();
 const imdb = useImdbStore();
@@ -43,7 +45,7 @@ const getMovieId = computed(() => {
     const arr = imdb.get_movie.id.split('/');
     return arr.filter(e => e === 0 || e)[1];
 });
-        
+
 const plot = computed(() => { 
     imdb.fetch_plot(getMovieId.value);
     return imdb.get_plot;

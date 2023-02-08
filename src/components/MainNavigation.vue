@@ -34,8 +34,8 @@ const router = useRouter();
 const searchstr = ref('');
 const imdb = useImdbStore();
 
-function search($event) {
-    $event.preventDefault();
+function search(event) {
+    event.preventDefault();
 
     if (route.name !== 'Home') { 
         router.push({
