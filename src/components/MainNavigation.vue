@@ -44,13 +44,13 @@ function search(event) {
     }
 
     imdb.searchStr = searchstr.value;
-    imdb.movies = [];
-    
+    imdb.sectionIndex = 0;
     imdb.fetch_movies(searchstr.value, 0);
 }
 
 function onHomeClick() { 
     imdb.movies = [];
+    imdb.noresults = false;
 
     router.push({
         name: 'Home',
@@ -62,6 +62,7 @@ function onHomeClick() {
     nav {
         padding-left:  var(--bs-gutter-x);
         padding-right: var(--bs-gutter-x);
+        box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.1);
     }
 
     ul {

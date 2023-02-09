@@ -11,15 +11,16 @@ const apiOptions = {
 export const useImdbStore = defineStore('imdb', {
     state: () => {
         return { 
-            movie: null,
-            movies: null,
-            plot: null,
-            currentPageIndex: 0,
-            resultsTotal: 0,
-            pagesTotal: 0,
-            searchStr: '',
             cast: null,
+            currentPageIndex: 0,
             loading: false,
+            movie: null,
+            movies: [],
+            noresults: false,
+            pagesTotal: 0,
+            plot: null,
+            resultsTotal: 0,
+            searchStr: '',
             sectionIndex: 0,
         }
     },
@@ -51,10 +52,14 @@ export const useImdbStore = defineStore('imdb', {
         get_sectionIndex(state) { 
             return state.sectionIndex;
         },
+        get_noresults(state) { 
+            return state.noresults;
+        },
     },
     actions: {
         async fetch_movies(text = '', paginationKey = 0) {
             this.loading = true;
+            this.noresults = false;
 
             // eslint-disable-next-line
             await fetch(`https://imdb8.p.rapidapi.com/title/v2/find?title=${text}&limit=20&sortArg=moviemeter%2Casc&paginationKey=${paginationKey}`, apiOptions)
@@ -69,6 +74,7 @@ export const useImdbStore = defineStore('imdb', {
                     this.pagesTotal = pagesTotal;
                     this.currentPageIndex = paginationKey;
                     this.loading = false;
+                    this.noresults = !!this.movies;
                 })
                 .catch(err => console.error(err));
         },

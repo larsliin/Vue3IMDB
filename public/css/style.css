@@ -7,13 +7,13 @@ body {
 .spinner {
     animation: spinner-bulqg1 0.8s infinite linear alternate, spinner-oaa3wk 1.6s infinite linear;
     border-radius: 50%;
-    border: 9px solid #333333;
-    height: 56px;
+    border: 5px solid #2758CC;
+    height: 40px;
     left: 50%;
-    margin: -28px 0 0 -28px;
+    margin: -20px 0 0 -20px;
     position: fixed;
     top: 50%;
-    width: 56px;
+    width: 40px;
 }
 
 @keyframes spinner-bulqg1 {

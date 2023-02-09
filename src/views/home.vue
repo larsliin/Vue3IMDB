@@ -1,6 +1,7 @@
 <template>
     <div class="container">
         <template v-if="imdb.movies && imdb.movies.length">
+            <p>Total results: {{ imdb.resultsTotal }}</p>
             <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
                 <tr v-for="movie in imdb.movies" :key="movie.id" role="button" @click="onTitleClick(movie.id)">
                     <td width="100%" class="pb-2">
@@ -17,16 +18,16 @@
                     </td>
                 </tr>
             </table>
-            <nav v-if="imdb.movies.length" aria-label="Page navigation example">
+            <nav v-if="imdb.resultsTotal > 20" aria-label="Page navigation">
                 <ul class="pagination">
-                    <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''">
-                        <a class="page-link" role="button" aria-label="Previous" @click="onPageinationClick('-')">
+                    <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''" v-if="imdb.pagesTotal > 10">
+                        <a class="page-link" role="button" aria-label="Previous" @click="loadSection('previous')">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    <li class="page-item" v-if="imdb.currentPageIndex > 9">
-                        <a class="page-link" role="button" aria-label="PreviousSection" @click="loadSection('previous')">
-                            <span aria-hidden="true">...</span>
+                    <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''">
+                        <a class="page-link" role="button" aria-label="Next" @click="onPageinationClick('-')">
+                            <span aria-hidden="true">&#60;</span>
                         </a>
                     </li>
                     <li v-for="index in Math.min(imdb.pagesTotal, 10)" :key="index" class="page-item">
@@ -38,20 +39,20 @@
                             {{ index + imdb.sectionIndex }}
                         </a>
                     </li>
-                    <li class="page-item" v-if="imdb.pagesTotal > 10">
-                        <a class="page-link" role="button" aria-label="NextSection" @click="loadSection('next')">
-                            <span aria-hidden="true">...</span>
-                        </a>
-                    </li>
                     <li class="page-item" :class="imdb.currentPageIndex === imdb.pagesTotal - 1 ? 'disabled' : ''">
                         <a class="page-link" role="button" aria-label="Next" @click="onPageinationClick('+')">
+                            <span aria-hidden="true">&#62;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" :class="imdb.currentPageIndex === imdb.pagesTotal - 1 ? 'disabled' : ''" v-if="imdb.pagesTotal > 10">
+                        <a class="page-link" role="button" aria-label="Next" @click="loadSection('next')">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 </ul>
             </nav>
         </template>
-        <template v-else-if="imdb.movies && imdb.movies.length === 0 && imdb.searchStr.length">
+        <template v-else-if="imdb.noresults">
             No results
         </template>
     </div>
@@ -107,10 +108,11 @@ async function onPageinationClick(key) {
     let pageKey;
     switch (key) { 
     case '+':
-        pageKey = imdb.get_currentPageIndex.value + 1;
+        console.log('+')
+        pageKey = imdb.get_currentPageIndex + 1;
         break;
     case '-':
-        pageKey = imdb.get_currentPageIndex.value - 1;
+        pageKey = imdb.get_currentPageIndex - 1;
         break;
     default:
         pageKey = key;
@@ -120,7 +122,7 @@ async function onPageinationClick(key) {
 
     await imdb.fetch_movies(imdb.get_searchStr, pageKey);
 
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 </script>
 
@@ -143,6 +145,11 @@ async function onPageinationClick(key) {
 
     .list-row:hover {
         box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-row td:first-child{
+        border-radius: 10px 0 0 10px;
+        overflow: hidden;
     }
 
     .wrapper-image {
@@ -168,7 +175,7 @@ async function onPageinationClick(key) {
     }
 
     .thumb-placeholder .spinner {
-        border: 4px solid #333333;
+        border-width: 3px;
         height: 24px;
         left: 50%;
         margin: -12px 0 0 -12px;
