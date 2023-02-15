@@ -27,7 +27,7 @@
 
 import { useRouter, useRoute } from 'vue-router';
 import { ref } from 'vue';
-import { useImdbStore } from '@/store/imdb/imdb';
+import { useImdbStore } from '@/store/imdbStore';
 
 const route = useRoute();
 const router = useRouter();

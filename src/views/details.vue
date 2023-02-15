@@ -31,7 +31,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { computed, onMounted } from 'vue';
-import { useImdbStore } from '@/store/imdb/imdb';
+import { useImdbStore } from '@/store/imdbStore';
 import contentPlaceholder from '@/components/ContentPlaceholder.vue';
 
 const route = useRoute();

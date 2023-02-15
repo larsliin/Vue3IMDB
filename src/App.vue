@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { useImdbStore } from '@/store/imdb/imdb';
+import { useImdbStore } from '@/store/imdbStore';
 
 const imdb = useImdbStore();
 </script>

@@ -60,7 +60,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useImdbStore } from '@/store/imdb/imdb';
+import { useImdbStore } from '@/store/imdbStore';
 
 const router = useRouter();
 const imdb = useImdbStore();
