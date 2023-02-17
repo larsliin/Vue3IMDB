@@ -2,22 +2,16 @@
     <div class="container">
         <template v-if="imdb.movies && imdb.movies.length">
             <p>Total results: {{ imdb.resultsTotal }}</p>
-            <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                <tr v-for="movie in imdb.movies" :key="movie.id" role="button" @click="onTitleClick(movie.id)">
-                    <td width="100%" class="pb-2">
-                        <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                            <tr class="list-row">
-                                <td valign="top" width="80" class="wrapper-image">
-                                    <img @load="onThumbLoaded" width="80"
-                                    :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
-                                    <div class="thumb-placeholder"><div class="spinner"></div></div>
-                                </td>
-                                <td valign="top" class="pt-2 pb-2 ps-2">{{ movie.title }}</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
+            
+            <div class="tiles">
+                <div v-for="movie in imdb.movies"
+                    :key="movie.id"
+                    @click="onTitleClick(movie.id)"
+                    class="tile">
+                    <tile :movie="movie"></tile>
+                </div>
+            </div>
+
             <nav v-if="imdb.resultsTotal > 20" aria-label="Page navigation">
                 <ul class="pagination">
                     <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''" v-if="imdb.pagesTotal > 10">
@@ -55,31 +49,52 @@
         <template v-else-if="imdb.noresults">
             No results
         </template>
+
+        <teleport to="#modal">
+            <modal v-if="selectedMovie" @close="onModalClose">
+                <movie-details :movie="selectedMovie" :plot="plot" @close="onModalClose"></movie-details>
+            </modal>
+        </teleport>
     </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useImdbStore } from '@/store/imdbStore';
+import { ref, onMounted, watch } from 'vue';
+import Tile from '@/components/Tile.vue';
+import Modal from '@/components/Modal.vue';
+import MovieDetails from '@/components/Details.vue';
 
 const router = useRouter();
+const route = useRoute();
 const imdb = useImdbStore();
 
-function onThumbLoaded(event) { 
-    event.target.classList.add('loaded')
-}
+const selectedMovie = ref();
+const plot = ref();
 
-function onTitleClick(event) { 
+async function onTitleClick(event) { 
     const movie = imdb.movies.find(e => e.id === event);
+    const movieId = getMovieId(movie.id);
 
-    imdb.movie = movie;
-    imdb.plot = '';
+    selectedMovie.value = movie;
 
     router.push({
-        name: 'Details',
+        name: 'Modal',
         params: {
-            id: getMovieId(movie.id),
+            id: movieId,
         },
+    });
+
+    plot.value = await imdb.fetch_plot(movieId);
+}
+
+function onModalClose() { 
+    selectedMovie.value = null;
+    plot.value = '';
+
+    router.push({
+        name: 'Home',
     });
 }
 
@@ -108,7 +123,6 @@ async function onPageinationClick(key) {
     let pageKey;
     switch (key) { 
     case '+':
-        console.log('+')
         pageKey = imdb.get_currentPageIndex + 1;
         break;
     case '-':
@@ -122,65 +136,54 @@ async function onPageinationClick(key) {
 
     await imdb.fetch_movies(imdb.get_searchStr, pageKey);
 
-    // window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
 }
+
+watch(route, () => {
+    switch (route.name) { 
+    case 'Home':
+        selectedMovie.value = null;
+        break;
+    case 'Modal':
+        break;
+    default:
+    }
+})
+
+onMounted(async() => { 
+    if (route.params.id) { 
+        const movie = await imdb.fetch_movie(route.params.id);
+        
+        selectedMovie.value = movie.results[0];
+
+        plot.value = await imdb.fetch_plot(route.params.id);
+    }
+});
 </script>
 
 <style scoped>
-    .wrapper {
+    .tiles {
+        column-gap: 20px;
         display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 50px;
+        row-gap: 40px;
     }
 
-    .wrapper > div {
-        flex: 1;
+    .tile {
+        flex-basis: calc(50% - 15px);
     }
 
-    input[type="checkbox"] {
-        margin-right: 8px;
+    @media only screen and (min-width: 768px) {
+        .tile {
+            flex-basis: calc(33% - 15px);
+        }
     }
 
-    .list-row {
-        border-radius: 10px;
+    @media only screen and (min-width: 992px) {
+        .tile {
+            flex-basis: calc(25% - 15px);
+        }
     }
 
-    .list-row:hover {
-        box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .list-row td:first-child{
-        border-radius: 10px 0 0 10px;
-        overflow: hidden;
-    }
-
-    .wrapper-image {
-        width: 80px;
-    }
-
-    .thumb-placeholder {
-        background-color: #eee;
-        height: 100px;
-        position: relative;
-        width: 80px;
-    }
-
-    img {
-        display: none;
-    }
-    img.loaded{
-        display: block;
-    }
-
-    img.loaded + .thumb-placeholder {
-        display: none;
-    }
-
-    .thumb-placeholder .spinner {
-        border-width: 3px;
-        height: 24px;
-        left: 50%;
-        margin: -12px 0 0 -12px;
-        position: absolute;
-        top: 50%;
-        width: 24px;
-    }
 </style>

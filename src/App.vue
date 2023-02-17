@@ -14,8 +14,10 @@
 
 <script setup>
 import { useImdbStore } from '@/store/imdbStore';
+import MainNavigation from './components/MainNavigation.vue';
 
 const imdb = useImdbStore();
+
 </script>
 
 <style scoped>

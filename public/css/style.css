@@ -2,12 +2,35 @@ html,
 body {
     font-family: Verdana, Geneva, sans-serif;
     margin: 0;
+    color: #010440;
+}
+
+.btn-outline-success.imdb {
+    --bs-btn-color: #048ABF;
+    --bs-btn-border-color: #048ABF;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #048ABF;
+    --bs-btn-hover-border-color: #048ABF;
+    --bs-btn-focus-shadow-rgb: 25,135,84;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #048ABF;
+    --bs-btn-active-border-color: #048ABF;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #048ABF;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #048ABF;
+    --bs-gradient: none;
+}
+
+.imdb-modal {
+    position: relative;
+    z-index: 9999;
 }
 
 .spinner {
     animation: spinner-bulqg1 0.8s infinite linear alternate, spinner-oaa3wk 1.6s infinite linear;
     border-radius: 50%;
-    border: 5px solid #2758CC;
+    border: 5px solid #010440;
     height: 40px;
     left: 50%;
     margin: -20px 0 0 -20px;

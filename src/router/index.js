@@ -1,18 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from '@/views/home.vue';
-import Details from '@/views/details.vue';
+import Modal from '@/components/Modal.vue';
 
 const routes = [
     {
         path: '/',
         name: 'Home',
         component: Home,
+        children: [{
+            path: '/details/:id',
+            name: 'Modal',
+            component: Modal,
+
+        }]
     },
-    {
-        path: '/details/:id',
-        name: 'Details',
-        component: Details,
-    }
 ];
 
 const router = createRouter({

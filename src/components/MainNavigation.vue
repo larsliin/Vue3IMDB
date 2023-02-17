@@ -1,26 +1,29 @@
 <template>
-    <nav class="navbar navbar-light bg-light">
-        <div class="container">
-            <a class="nav-link" role="button" @click="onHomeClick">HOME</a>
-            <div class="navbar" id="navbarSupportedContent">
-                <form
-                    class="form-inline my-2"
-                    @submit.prevent="search">
-                    <input
-                        v-model="searchstr"
-                        class="form-control inp-search me-2"
-                        type="search"
-                        placeholder="Search"
-                        aria-label="Search">
-                    <button
-                        :disabled="!searchstr"
-                        class="btn btn-outline-success my-2 my-sm-0 inp-button"
-                        type="button"
-                        @click.prevent="search">Search</button>
-                </form>
+    <div>
+        <div class="margin"></div>
+        <nav class="navbar">
+            <div class="container">
+                <a class="nav-link" role="button" @click="onHomeClick">HOME</a>
+                <div class="navbar" id="navbarSupportedContent">
+                    <form
+                        class="form-inline my-2"
+                        @submit.prevent="search">
+                        <input
+                            v-model="searchstr"
+                            class="form-control inp-search me-2"
+                            type="search"
+                            placeholder="Search"
+                            aria-label="Search">
+                        <button
+                            :disabled="!searchstr"
+                            class="btn btn-outline-success my-2 my-sm-0 inp-button imdb"
+                            type="button"
+                            @click.prevent="search">Search</button>
+                    </form>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </div>
 </template>
 
 <script setup>
@@ -34,7 +37,7 @@ const router = useRouter();
 const searchstr = ref('');
 const imdb = useImdbStore();
 
-function search(event) {
+async function search(event) {
     event.preventDefault();
 
     if (route.name !== 'Home') { 
@@ -46,6 +49,8 @@ function search(event) {
     imdb.searchStr = searchstr.value;
     imdb.sectionIndex = 0;
     imdb.fetch_movies(searchstr.value, 0);
+
+    window.scrollTo(0, 0);
 }
 
 function onHomeClick() { 
@@ -59,10 +64,20 @@ function onHomeClick() {
 
 </script>
 <style scoped>
+    .margin {
+        margin-bottom: 86px;
+        pointer-events: none;
+    }
     nav {
+        background-color: #010440;
+        box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.1);
+        color: #0BB3D9;
         padding-left:  var(--bs-gutter-x);
         padding-right: var(--bs-gutter-x);
-        box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 100%;
+        z-index: 10;
+        top: 0;
     }
 
     ul {
