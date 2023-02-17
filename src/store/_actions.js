@@ -30,32 +30,62 @@ export default {
 
         return list;
     },
-    async fetch_plot(id) {
-        const response = await fetch(`https://imdb8.p.rapidapi.com/title/get-plots?tconst=${id}`, {
-            method: 'GET',
-            headers: {
-                'X-RapidAPI-Key': constants.KEY,
-                'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+    async fetch_plot(id, signal) {
+        try {
+            const response = await fetch(`https://imdb8.p.rapidapi.com/title/get-plots?tconst=${id}`, {
+                method: 'GET',
+                signal: signal,
+                headers: {
+                    'X-RapidAPI-Key': constants.KEY,
+                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+                }
+            });
+            const plot = await response.json();
+            
+            if (plot.plots.length) {
+                return plot.plots[0].text;
+            } else { 
+                return 'No plot description available';
             }
-        });
-        const plot = await response.json();
-        
-        if (plot.plots.length) {
-            return plot.plots[0].text;
-        } else { 
-            return 'No plot description available';
+        } catch (error) {
+            console.warn('request aborted');
+            return null;
         }
     },
-    async fetch_movie(id) {
-        const response = await fetch(`https://imdb8.p.rapidapi.com/title/find?q=${id}`, {
-            method: 'GET',
-            headers: {
-                'X-RapidAPI-Key': constants.KEY,
-                'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
-            }
-        });
-        const movie = await response.json();
-
-        return movie;
+    async fetch_details(id, signal) {
+        try {
+            const response = await fetch(`https://imdb8.p.rapidapi.com/title/get-details?tconst=${id}`, {
+                method: 'GET',
+                signal: signal,
+                headers: {
+                    'X-RapidAPI-Key': constants.KEY,
+                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+                }
+            });
+            const details = await response.json();
+            
+            return details;
+        } catch (error) {
+            console.warn('request aborted');
+            return null;
+        }
+    },
+    async fetch_actors(id, signal) {
+        try {
+            const response = await fetch(`https://imdb8.p.rapidapi.com/title/get-full-credits?tconst=${id}`, {
+                method: 'GET',
+                signal: signal,
+                headers: {
+                    'X-RapidAPI-Key': constants.KEY,
+                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+                }
+            });
+            const credits = await response.json();
+            
+            return credits;
+        } catch (error) {
+            console.warn('request aborted');
+            return null;
+        }
     },
 };

@@ -1,6 +1,5 @@
 <template>
-    <div>
-        <div class="margin"></div>
+    <div class="wrapper">
         <nav class="navbar">
             <div class="container">
                 <a class="nav-link" role="button" @click="onHomeClick">HOME</a>
@@ -64,9 +63,8 @@ function onHomeClick() {
 
 </script>
 <style scoped>
-    .margin {
-        margin-bottom: 86px;
-        pointer-events: none;
+    .wrapper {
+        height: 120px;
     }
     nav {
         background-color: #010440;

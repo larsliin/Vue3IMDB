@@ -1,84 +1,69 @@
 <template>
     <div class="container">
-        <template v-if="imdb.movies && imdb.movies.length">
-            <p>Total results: {{ imdb.resultsTotal }}</p>
-            
-            <div class="tiles">
-                <div v-for="movie in imdb.movies"
-                    :key="movie.id"
-                    @click="onTitleClick(movie.id)"
-                    class="tile">
-                    <tile :movie="movie"></tile>
-                </div>
+        <div class="row">
+            <div class="col-12">
+                <template v-if="imdb.movies && imdb.movies.length">
+                    <p>Total results: {{ imdb.resultsTotal }}</p>
+                    <div class="tiles">
+                        <div v-for="movie in imdb.movies"
+                            :key="movie.id"
+                            @click="onTitleClick(movie.id)"
+                            class="tile">
+                            <tile :movie="movie"></tile>
+                        </div>
+                    </div>
+                    <pagination></pagination>
+                </template>
+                <template v-else-if="imdb.noresults">
+                    No results
+                </template>
+                <teleport to="#modal">
+                    <modal v-if="modalOpen" @close="onModalClose">
+                        <movie-details
+                            :movie="movieDetailsSelected"
+                            :plot="plot"
+                            :credits="credits"
+                            @close="onModalClose"></movie-details>
+                    </modal>
+                </teleport>
             </div>
-
-            <nav v-if="imdb.resultsTotal > 20" aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''" v-if="imdb.pagesTotal > 10">
-                        <a class="page-link" role="button" aria-label="Previous" @click="loadSection('previous')">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item" :class="imdb.currentPageIndex === 0 ? 'disabled' : ''">
-                        <a class="page-link" role="button" aria-label="Next" @click="onPageinationClick('-')">
-                            <span aria-hidden="true">&#60;</span>
-                        </a>
-                    </li>
-                    <li v-for="index in Math.min(imdb.pagesTotal, 10)" :key="index" class="page-item">
-                        <a
-                            class="page-link"
-                            role="button"
-                            :class="imdb.currentPageIndex === (index + imdb.sectionIndex) - 1 ? 'fw-bold' : ''"
-                            @click="onPageinationClick((index + imdb.sectionIndex) - 1)">
-                            {{ index + imdb.sectionIndex }}
-                        </a>
-                    </li>
-                    <li class="page-item" :class="imdb.currentPageIndex === imdb.pagesTotal - 1 ? 'disabled' : ''">
-                        <a class="page-link" role="button" aria-label="Next" @click="onPageinationClick('+')">
-                            <span aria-hidden="true">&#62;</span>
-                        </a>
-                    </li>
-                    <li class="page-item" :class="imdb.currentPageIndex === imdb.pagesTotal - 1 ? 'disabled' : ''" v-if="imdb.pagesTotal > 10">
-                        <a class="page-link" role="button" aria-label="Next" @click="loadSection('next')">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </template>
-        <template v-else-if="imdb.noresults">
-            No results
-        </template>
-
-        <teleport to="#modal">
-            <modal v-if="selectedMovie" @close="onModalClose">
-                <movie-details :movie="selectedMovie" :plot="plot" @close="onModalClose"></movie-details>
-            </modal>
-        </teleport>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
 import { useImdbStore } from '@/store/imdbStore';
-import { ref, onMounted, watch } from 'vue';
-import Tile from '@/components/Tile.vue';
-import Modal from '@/components/Modal.vue';
-import MovieDetails from '@/components/Details.vue';
+import { ref, onMounted } from 'vue';
+import tile from '@/components/Tile.vue';
+import modal from '@/components/Modal.vue';
+import MovieDetails from '@/components/MovieDetails.vue';
+import pagination from '@/components/Pagination.vue';
 
 const router = useRouter();
 const route = useRoute();
 const imdb = useImdbStore();
 
-const selectedMovie = ref();
+const movieDetailsSelected = ref();
+const modalOpen = ref(false);
 const plot = ref();
+const credits = ref();
+const loading = ref(false);
+let controllerDetails = new AbortController();
+let controllerPlot = new AbortController();
+let controllerActors = new AbortController();
+
 
 async function onTitleClick(event) { 
     const movie = imdb.movies.find(e => e.id === event);
     const movieId = getMovieId(movie.id);
 
-    selectedMovie.value = movie;
+    // abourt active fetch requests
+    abortRequests();
 
+    modalOpen.value = true;
+
+    // update browser URL
     router.push({
         name: 'Modal',
         params: {
@@ -86,16 +71,47 @@ async function onTitleClick(event) {
         },
     });
 
-    plot.value = await imdb.fetch_plot(movieId);
+    // load movie details if selected movie is different from previous selected
+    if (!movieDetailsSelected.value || (movieDetailsSelected.value && (getMovieId(movieDetailsSelected.value.id) !== movieId))) {
+        movieDetailsSelected.value = null;
+        plot.value = null;
+        credits.value = null;
+
+        loading.value = true;
+
+        // fetch selected movie plot
+        imdb.fetch_plot(movieId, controllerPlot.signal).then((response) => { 
+            plot.value = response;
+        });
+
+        // fetch selected movie full credits
+        imdb.fetch_actors(movieId, controllerActors.signal).then((response) => { 
+            credits.value = response;
+        });
+
+        // fetch selected movie details
+        movieDetailsSelected.value = await imdb.fetch_details(movieId, controllerDetails.signal);
+
+        loading.value = false;
+    }
 }
 
 function onModalClose() { 
-    selectedMovie.value = null;
-    plot.value = '';
-
+    modalOpen.value = false;
     router.push({
         name: 'Home',
     });
+}
+
+function abortRequests() {
+    if (loading.value) { 
+        controllerDetails.abort();
+        controllerDetails = new AbortController();
+        controllerPlot.abort();
+        controllerPlot = new AbortController();
+        controllerActors.abort();
+        controllerActors = new AbortController();
+    }
 }
 
 function getMovieId (id) { 
@@ -103,60 +119,18 @@ function getMovieId (id) {
     return arr.filter(e => e === 0 || e)[1];
 };
 
-function loadSection(dir) { 
-    let key;
-    switch (dir) { 
-    case 'previous':
-        imdb.sectionIndex = imdb.get_sectionIndex - 10;
-        
-        key = imdb.get_sectionIndex + 9;
-        break;
-    case 'next':
-        imdb.sectionIndex = imdb.get_sectionIndex + 10;
-        key = imdb.get_sectionIndex;
-        break;
-    }
-    onPageinationClick(key);
-}
-
-async function onPageinationClick(key) {
-    let pageKey;
-    switch (key) { 
-    case '+':
-        pageKey = imdb.get_currentPageIndex + 1;
-        break;
-    case '-':
-        pageKey = imdb.get_currentPageIndex - 1;
-        break;
-    default:
-        pageKey = key;
-    }
-
-    imdb.sectionIndex = pageKey - (pageKey % 10);
-
-    await imdb.fetch_movies(imdb.get_searchStr, pageKey);
-
-    window.scrollTo(0, 0);
-}
-
-watch(route, () => {
-    switch (route.name) { 
-    case 'Home':
-        selectedMovie.value = null;
-        break;
-    case 'Modal':
-        break;
-    default:
-    }
-})
-
 onMounted(async() => { 
     if (route.params.id) { 
-        const movie = await imdb.fetch_movie(route.params.id);
-        
-        selectedMovie.value = movie.results[0];
+        modalOpen.value = true;
+        imdb.fetch_plot(route.params.id, controllerPlot.signal).then((response) => { 
+            plot.value = response;
+        });
+        // fetch selected movie full credits
+        imdb.fetch_actors(route.params.id, controllerActors.signal).then((response) => { 
+            credits.value = response;
+        });
 
-        plot.value = await imdb.fetch_plot(route.params.id);
+        movieDetailsSelected.value = await imdb.fetch_details(route.params.id, controllerDetails.signal);
     }
 });
 </script>

@@ -1,11 +1,17 @@
 <template>
     <div class="wrapper">
-        <div class="placeholder" v-for="index in 3" :key="index"></div>
+        <div class="placeholder" v-for="index in lines" :key="index" :style="{width: index === lines ? width: ''}"></div>
     </div>
 </template>
 
 <script setup>
-
+const props = defineProps({
+    width: String,
+    lines: {
+        type: Number,
+        default: 3,
+    }
+});
 </script>
 <style scoped>
     .wrapper {
@@ -16,16 +22,13 @@
         background-color: #fff;
         border-radius: 6px;
         font-size: 0;
-        height: 10px;
+        height: 8px;
         line-height: 0;
         margin-bottom: 5px;
         margin-top: 5px;
         width: 100%;
     }
 
-    .placeholder:last-child {
-        width: 33%;
-    }
 
     @keyframes pulse {
         0% { 

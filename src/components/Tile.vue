@@ -4,7 +4,7 @@
         <div class="img-wrapper">
             <img @load="onThumbLoaded"
                 :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
-                <div class="thumb-placeholder"><div class="spinner"></div></div>
+                <div class="thumb-placeholder"><spinner /></div>
         </div>
         <div class="m-3">
             <h6>{{ movie.title }}</h6>
@@ -14,6 +14,7 @@
 </template>
 
 <script setup>
+import Spinner from '@/components/Spinner.vue';
 
 defineProps({
     movie: Object,
