@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from "vue-router";
-import Home from '@/views/home.vue';
-import Modal from '@/components/Modal.vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '@/views/HomeView.vue';
+import Modal from '@/components/ModalContainer.vue';
 
 const routes = [
     {
@@ -12,7 +12,7 @@ const routes = [
             name: 'Modal',
             component: Modal,
 
-        }]
+        }],
     },
 ];
 

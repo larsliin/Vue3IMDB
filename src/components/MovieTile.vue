@@ -1,28 +1,30 @@
 <template>
-    
+
     <div class="wrapper">
         <div class="img-wrapper">
-            <img @load="onThumbLoaded"
+            <img
+                alt=""
+                @load="onThumbLoaded"
                 :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
-                <div class="thumb-placeholder"><spinner /></div>
+            <div class="thumb-placeholder"><spinner-radial /></div>
         </div>
         <div class="m-3">
             <h6>{{ movie.title }}</h6>
             <p>{{ movie.year }}</p>
         </div>
-    </div>  
+    </div>
 </template>
 
 <script setup>
-import Spinner from '@/components/Spinner.vue';
+    import spinnerRadial from '@/components/SpinnerRadial.vue';
 
-defineProps({
-    movie: Object,
-});
+    defineProps({
+        movie: Object,
+    });
 
-function onThumbLoaded(event) { 
-    event.target.classList.add('loaded')
-}
+    function onThumbLoaded(event) {
+        event.target.classList.add('loaded');
+    }
 </script>
 <style scoped>
     .wrapper {
@@ -68,5 +70,4 @@ function onThumbLoaded(event) {
         display: none;
     }
 
-    
 </style>

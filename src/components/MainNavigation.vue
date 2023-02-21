@@ -2,7 +2,12 @@
     <div class="wrapper">
         <nav class="navbar">
             <div class="container">
-                <a class="nav-link" role="button" @click="onHomeClick">HOME</a>
+                <a
+                    class="nav-link"
+                    role="button"
+                    tabindex="0"
+                    @click="onHomeClick()"
+                    @keydown="onHomeClick()">HOME</a>
                 <div class="navbar" id="navbarSupportedContent">
                     <form
                         class="form-inline my-2"
@@ -26,40 +31,39 @@
 </template>
 
 <script setup>
+    import { useRouter, useRoute } from 'vue-router';
+    import { ref } from 'vue';
+    import { useImdbStore } from '@/store/imdbStore';
 
-import { useRouter, useRoute } from 'vue-router';
-import { ref } from 'vue';
-import { useImdbStore } from '@/store/imdbStore';
+    const route = useRoute();
+    const router = useRouter();
+    const searchstr = ref('');
+    const imdbStore = useImdbStore();
 
-const route = useRoute();
-const router = useRouter();
-const searchstr = ref('');
-const imdb = useImdbStore();
+    async function search(event) {
+        event.preventDefault();
 
-async function search(event) {
-    event.preventDefault();
+        if (route.name !== 'Home') {
+            router.push({
+                name: 'Home',
+            });
+        }
 
-    if (route.name !== 'Home') { 
+        imdbStore.searchStr = searchstr.value;
+        imdbStore.sectionIndex = 0;
+        imdbStore.fetch_movies(searchstr.value, 0);
+
+        window.scrollTo(0, 0);
+    }
+
+    function onHomeClick() {
+        imdbStore.movies = [];
+        imdbStore.noresults = false;
+
         router.push({
             name: 'Home',
         });
     }
-
-    imdb.searchStr = searchstr.value;
-    imdb.sectionIndex = 0;
-    imdb.fetch_movies(searchstr.value, 0);
-
-    window.scrollTo(0, 0);
-}
-
-function onHomeClick() { 
-    imdb.movies = [];
-    imdb.noresults = false;
-
-    router.push({
-        name: 'Home',
-    });
-}
 
 </script>
 <style scoped>

@@ -1,20 +1,19 @@
 <template>
     <div>
         <main-navigation></main-navigation>
-        <div class="loader" v-if="imdb.loading">
-            <spinner />
+        <div class="loader" v-if="imdbStore.loading">
+            <spinner-radial />
         </div>
         <router-view />
     </div>
 </template>
 
 <script setup>
-import { useImdbStore } from '@/store/imdbStore';
-import MainNavigation from '@/components/MainNavigation.vue';
-import Spinner from '@/components/Spinner.vue';
+    import { useImdbStore } from '@/store/imdbStore';
+    import MainNavigation from '@/components/MainNavigation.vue';
+    import spinnerRadial from '@/components/SpinnerRadial.vue';
 
-const imdb = useImdbStore();
-
+    const imdbStore = useImdbStore();
 </script>
 
 <style scoped>

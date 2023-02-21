@@ -2,12 +2,13 @@
     <div>
         <div class="modal-image-wrapper">
             <img
+                alt=""
                 v-if="movie"
-                :src="movie.image ? movie.image.url : '/assets/No-Image-Placeholder-Large.png'" class="modal-image" />
-                
+                :src="imgSource" class="modal-image" />
+
             <div class="modal-image-gradient"></div>
         </div>
-        
+
         <div class="px-5 py-2">
             <ul class="list-unstyled">
                 <li>
@@ -64,20 +65,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import textPlaceholder from '@/components/TextPlaceholder.vue';
 
-const emit = defineEmits(['close']);
+    import { computed } from 'vue';
+    import textPlaceholder from '@/components/TextPlaceholder.vue';
 
-const props = defineProps({
-    movie: Object,
-    plot: String,
-    credits: Object,
-});
+    const props = defineProps({
+        movie: Object,
+        plot: String,
+        credits: Object,
+    });
 
-const starringList = computed(() => {
-    return props.credits.cast ? props.credits.cast.map(e => e.name).join(', ') : null;
-});
+    const starringList = computed(() => (props.credits.cast ? props.credits.cast.map((e) => e.name).join(', ') : null));
+    const imgSource = computed(() => (props.movie.image ? props.movie.image.url : '/assets/No-Image-Placeholder-Large.png'));
 
 </script>
 

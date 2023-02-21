@@ -1,5 +1,5 @@
 <template>
-    <div class="lightbox" @click="close">
+    <div class="lightbox" @click.self="emit('close')" @keydown.self="emit('close')">
         <div class="lightbox-container">
             <button class="close-button" @click="emit('close')"></button>
             <div class="lightbox-content">
@@ -10,15 +10,7 @@
 </template>
 
 <script setup>
-
-const emit = defineEmits(['close']);
-
-function close(event) { 
-    const {classList} = event.target;
-    if (classList.contains('lightbox') || classList.contains('lightbox-container')) {
-        emit('close');
-    }
-}
+    const emit = defineEmits(['close']);
 </script>
 <style scoped>
 .close-button {

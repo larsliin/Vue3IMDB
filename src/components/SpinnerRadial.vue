@@ -3,9 +3,10 @@
 </template>
 
 <script setup>
-const props = defineProps({
-    color: String,
-});
+    // eslint-disable-next-line no-unused-vars
+    const props = defineProps({
+        color: String,
+    });
 </script>
 <style scoped>
 
