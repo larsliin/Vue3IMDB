@@ -5,13 +5,14 @@
 </template>
 
 <script setup>
-const props = defineProps({
-    width: String,
-    lines: {
-        type: Number,
-        default: 3,
-    }
-});
+    // eslint-disable-next-line no-unused-vars
+    const props = defineProps({
+        width: String,
+        lines: {
+            type: Number,
+            default: 3,
+        },
+    });
 </script>
 <style scoped>
     .wrapper {
@@ -29,10 +30,9 @@ const props = defineProps({
         width: 100%;
     }
 
-
     @keyframes pulse {
-        0% { 
-            opacity:.5; 
+        0% {
+            opacity:.5;
         }
         50% {
              opacity:.25;

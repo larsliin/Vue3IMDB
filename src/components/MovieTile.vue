@@ -5,7 +5,7 @@
             <img
                 alt=""
                 @load="onThumbLoaded"
-                :src="movie.image ? movie.image.url : 'assets/No-Image-Placeholder.png'" class="img-fluid" />
+                :src="imgSource" class="img-fluid" />
             <div class="thumb-placeholder"><spinner-radial /></div>
         </div>
         <div class="m-3">
@@ -16,15 +16,18 @@
 </template>
 
 <script setup>
+    import { computed } from 'vue';
     import spinnerRadial from '@/components/SpinnerRadial.vue';
 
-    defineProps({
+    const props = defineProps({
         movie: Object,
     });
 
     function onThumbLoaded(event) {
         event.target.classList.add('loaded');
     }
+
+    const imgSource = computed(() => (props.movie.image ? props.movie.image.url : '/assets/No-Image-Placeholder.png'));
 </script>
 <style scoped>
     .wrapper {

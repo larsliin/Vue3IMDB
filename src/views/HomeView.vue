@@ -20,11 +20,11 @@
                 </template>
                 <teleport to="#modal">
                     <modal-container v-if="modalOpen" @close="onModalClose">
-                        <movie-details
+                        <movie-view
                             :movie="movieDetails"
                             :plot="moviePlot"
                             :credits="movieCredits"
-                            @close="onModalClose"></movie-details>
+                            @close="onModalClose" />
                     </modal-container>
                 </teleport>
             </div>
@@ -36,6 +36,7 @@
     import { useRouter, useRoute } from 'vue-router';
     import { useImdbStore } from '@/store/imdbStore';
     import { ref, onMounted } from 'vue';
+    import movieView from '@/views/MovieView.vue';
     import movieTile from '@/components/MovieTile.vue';
     import modalContainer from '@/components/ModalContainer.vue';
     import paginationNavigation from '@/components/PaginationNavigation.vue';
@@ -54,7 +55,6 @@
     let controllerActors = new AbortController();
 
     async function updateMovieDetails(movieId) {
-        console.log();
         movieDetails.value = null;
         moviePlot.value = null;
         movieCredits.value = null;

@@ -45,10 +45,10 @@
         let pageKey;
         switch (key) {
         case '+':
-            pageKey = imdbStore.get_currentPageIndex + 1;
+            pageKey = imdbStore.currentPageIndex + 1;
             break;
         case '-':
-            pageKey = imdbStore.get_currentPageIndex - 1;
+            pageKey = imdbStore.currentPageIndex - 1;
             break;
         default:
             pageKey = key;
@@ -56,7 +56,7 @@
 
         imdbStore.sectionIndex = pageKey - (pageKey % 10);
 
-        await imdbStore.fetch_movies(imdbStore.get_searchStr, pageKey);
+        await imdbStore.fetch_movies(imdbStore.searchStr, pageKey);
 
         window.scrollTo(0, 0);
     }
@@ -65,13 +65,13 @@
         let key;
         switch (dir) {
         case 'previous':
-            imdbStore.sectionIndex = imdbStore.get_sectionIndex - 10;
+            imdbStore.sectionIndex -= 10;
 
-            key = imdbStore.get_sectionIndex + 9;
+            key = imdbStore.sectionIndex + 9;
             break;
         case 'next':
-            imdbStore.sectionIndex = imdbStore.get_sectionIndex + 10;
-            key = imdbStore.get_sectionIndex;
+            imdbStore.sectionIndex += 10;
+            key = imdbStore.sectionIndex;
             break;
         default:
         }
