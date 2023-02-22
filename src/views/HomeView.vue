@@ -35,7 +35,7 @@
 <script setup>
     import { useRouter, useRoute } from 'vue-router';
     import { useImdbStore } from '@/store/imdbStore';
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
     import movieView from '@/views/MovieView.vue';
     import movieTile from '@/components/MovieTile.vue';
     import modalContainer from '@/components/ModalContainer.vue';
@@ -54,25 +54,36 @@
     let controllerPlot = new AbortController();
     let controllerActors = new AbortController();
 
-    async function updateMovieDetails(movieId) {
-        movieDetails.value = null;
-        moviePlot.value = null;
-        movieCredits.value = null;
+    async function updateMovieDetails(movieId, clear = true) {
+        if (clear) {
+            movieDetails.value = null;
+            moviePlot.value = null;
+            movieCredits.value = null;
+        }
 
         loading.value = true;
+        modalOpen.value = true;
 
         // fetch selected movie full movieCredits
         imdbStore.fetch_actors(movieId, controllerActors.signal).then((response) => {
-            movieCredits.value = response;
+            if (!response.error) {
+                movieCredits.value = response;
+            }
         });
 
         // fetch selected movie plot
         imdbStore.fetch_plot(movieId, controllerPlot.signal).then((response) => {
-            moviePlot.value = response;
+            if (!response.error) {
+                moviePlot.value = response;
+            }
         });
 
         // fetch selected movie details
-        movieDetails.value = await imdbStore.fetch_details(movieId, controllerDetails.signal);
+        await imdbStore.fetch_details(movieId, controllerDetails.signal).then((response) => {
+            if (!response.error) {
+                movieDetails.value = response;
+            }
+        });
 
         loading.value = false;
     }
@@ -104,11 +115,6 @@
         const movie = imdbStore.movies.find((e) => e.id === event);
         const movieId = getMovieId(movie.id);
 
-        // abourt active fetch requests
-        abortRequests();
-
-        modalOpen.value = true;
-
         // update browser URL
         router.push({
             name: 'Modal',
@@ -116,25 +122,28 @@
                 id: movieId,
             },
         });
-
-        // load movie details if selected movie is different from previous selected
-        if (!movieDetails.value || (movieDetails.value && (getMovieId(movieDetails.value.id) !== movieId))) {
-            updateMovieDetails(movieId);
-        }
     }
+
+    watch(() => route.name, () => {
+        if (route.params.id) {
+            const isSame = movieDetails.value ? getMovieId(movieDetails.value.id) === route.params.id : false;
+
+            if (!isSame) {
+                // abort active fetch requests
+                abortRequests();
+            }
+
+            updateMovieDetails(route.params.id, !isSame);
+        } else {
+            modalOpen.value = false;
+        }
+    });
 
     onMounted(async () => {
         if (route.params.id) {
-            modalOpen.value = true;
-            imdbStore.fetch_plot(route.params.id, controllerPlot.signal).then((response) => {
-                moviePlot.value = response;
-            });
-            // fetch selected movie full movieCredits
-            imdbStore.fetch_actors(route.params.id, controllerActors.signal).then((response) => {
-                movieCredits.value = response;
-            });
-
-            movieDetails.value = await imdbStore.fetch_details(route.params.id, controllerDetails.signal);
+            updateMovieDetails(route.params.id);
+        } else {
+            modalOpen.value = false;
         }
     });
 </script>

@@ -36,7 +36,7 @@ export default {
 
             return list;
         } catch (error) {
-            console.warn('request aborted');
+            console.warn('Movies request aborted');
             return null;
         }
     },
@@ -60,8 +60,8 @@ export default {
             }
             return 'No plot description available';
         } catch (error) {
-            console.warn('request aborted');
-            return null;
+            console.warn('Plot request aborted');
+            return { error: true, message: error };
         }
     },
     async fetch_details(id, signal) {
@@ -81,8 +81,8 @@ export default {
 
             return details;
         } catch (error) {
-            console.warn('request aborted');
-            return null;
+            console.warn('Details request aborted');
+            return { error: true, message: error };
         }
     },
     async fetch_actors(id, signal) {
@@ -102,8 +102,8 @@ export default {
 
             return credits;
         } catch (error) {
-            console.warn('request aborted');
-            return null;
+            console.warn('Actors request aborted');
+            return { error: true, message: error };
         }
     },
 };
